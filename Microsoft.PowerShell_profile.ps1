@@ -31,7 +31,7 @@ function Update-Profile {
             $updateConfirmation = Read-Host `
                 "A new profile update is available. Do you want to update the profile? (Y/n)"
             if ($updateConfirmation -match '^(Y|y)?$') {
-                Copy-Item -Path $tempPath -Destination $PROFILE -Force
+                Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
                 Write-Host "Profile has been updated. Restart shell to reflect changes"
             }
             else {
