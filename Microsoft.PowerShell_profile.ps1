@@ -27,14 +27,23 @@ function Update-Profile {
         $oldhash = Get-FileHash $PROFILE
         Invoke-RestMethod $url -OutFile "$env:temp/Microsoft.PowerShell_profile.ps1"
         $newhash = Get-FileHash "$env:temp/Microsoft.PowerShell_profile.ps1"
-        if ($newhash.Hash -ne $oldhash.Hash) {
-            Copy-Item -Path "$env:temp/Microsoft.PowerShell_profile.ps1" -Destination $PROFILE -Force
-            Write-Host "Profile has been updated. Please restart your shell to reflect changes" -ForegroundColor Magenta
+        if ($newHash.Hash -ne $oldHash.Hash) {
+            $updateConfirmation = Read-Host `
+                "A new profile update is available. Do you want to update the profile? (Y/n)"
+            if ($updateConfirmation -match '^(Y|y)?$') {
+                Copy-Item -Path $tempPath -Destination $PROFILE -Force
+                Write-Host "Profile has been updated. Restart shell to reflect changes"
+            }
+            else {
+                Write-Host "Profile update canceled by user."
+            }
         }
-    } catch {
-        Write-Error "Unable to check for `$profile updates"
-    } finally {
-        Remove-Item "$env:temp/Microsoft.PowerShell_profile.ps1" -ErrorAction SilentlyContinue
+    }
+    catch {
+        Write-Error "Unable to check for `$profile updates. Error: $_"
+    }
+    finally {
+        Remove-Item $tempPath -ErrorAction SilentlyContinue
     }
 }
 Update-Profile
